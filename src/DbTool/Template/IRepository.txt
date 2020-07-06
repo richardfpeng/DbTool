@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using SystemManagement.Entity;
+using WeihanLi.EntityFramework;
+
+namespace SystemManagement.Repository.Contract
+{
+    public interface {IF_NAME} : IEFRepository<SystemManageDbContext, {MODEL_NAME}>
+    {
+    }
+}

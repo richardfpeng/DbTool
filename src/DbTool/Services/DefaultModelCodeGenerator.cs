@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using DbTool.Core;
 using DbTool.Core.Entity;
+using WeihanLi.Extensions;
 
 // ReSharper disable once CheckNamespace
 namespace DbTool
@@ -116,6 +118,7 @@ namespace DbTool
                         index++;
                     }
                     var fclType = dbProvider.DbType2ClrType(item.DataType, item.IsNullable);
+                    if (item.DataType.EqualsIgnoreCase("TINYINT")) fclType = "bool";
 
                     if (options.GenerateDataAnnotation)
                     {
@@ -145,6 +148,51 @@ namespace DbTool
             sbText.AppendLine("}");
             return sbText.ToString();
         }
+
+        public string GenerateDTOCode(TableEntity tableEntity, ModelCodeGenerateOptions options, string DtoName, string databaseType)
+        {
+            if (tableEntity == null)
+            {
+                throw new ArgumentNullException(nameof(tableEntity));
+            }
+
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(tableEntity));
+            }
+
+            var dbProvider = _dbProviderFactory.GetDbProvider(databaseType);
+            var sbText = new StringBuilder();
+
+            var index = 0;
+
+
+            foreach (var item in tableEntity.Columns)
+            {
+                if (item.ColumnName.EqualsIgnoreCase("id")) continue;
+
+                if (index > 0)
+                {
+                    sbText.AppendLine();
+                }
+                else
+                {
+                    index++;
+                }
+                var fclType = dbProvider.DbType2ClrType(item.DataType, item.IsNullable);
+                if (item.DataType.EqualsIgnoreCase("TINYINT")) fclType = "bool";
+                sbText.AppendLine($"\t\tpublic {fclType} {item.ColumnName} {{ get; set; }}");
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(File.ReadAllText(@"Template\DTO.txt"));
+            sb.Replace("{PROPERTIES}", sbText.ToString());
+            sb.Replace("{DTO_NAME}", DtoName);
+
+            return sb.ToString();
+
+        }
+
 
         public string GenerateDialogCode(TableEntity tableEntity, ModelCodeGenerateOptions options, string databaseType)
         {
@@ -269,5 +317,56 @@ namespace DbTool
 
             return $"_{propertyName}";
         }
+
+
+        internal string GenerateIRepositoryCode(string IFName, string modelName)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(File.ReadAllText(@"Template\IRepository.txt"));
+            sb.Replace("{IF_NAME}", IFName);
+            sb.Replace("{MODEL_NAME}", modelName);
+
+            return sb.ToString();
+        }
+
+        internal string GenerateRepositoryCode(string IFName, string className, string modelName)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(File.ReadAllText(@"Template\Repository.txt"));
+            sb.Replace("{CLS_NAME}", className);
+            sb.Replace("{IF_NAME}", IFName);
+            sb.Replace("{MODEL_NAME}", modelName);
+
+            return sb.ToString();
+        }
+
+        internal string GenerateIServiceCode(string IServiceName, string DtoName)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(File.ReadAllText(@"Template\IService.txt"));
+            sb.Replace("{IServiceName}", IServiceName);
+            sb.Replace("{DTO_NAME}", DtoName);
+
+            return sb.ToString();
+        }
+
+        internal string GenerateServiceCode(string ServiceName
+            , string IServiceName
+            , string IRepository
+            , string DtoName
+            , string modelName)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(File.ReadAllText(@"Template\Service.txt"));
+            sb.Replace("{ServiceName}", ServiceName);
+            sb.Replace("{IServiceName}", IServiceName);
+            sb.Replace("{DTO_NAME}", DtoName);
+            sb.Replace("{MODEL_NAME}", modelName);
+            sb.Replace("{IRepository}", IRepository);
+
+            return sb.ToString();
+        }
+
+
     }
 }

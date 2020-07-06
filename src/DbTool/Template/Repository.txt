@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using SystemManagement.Entity;
+using SystemManagement.Repository.Contract;
+using WeihanLi.EntityFramework;
+
+namespace SystemManagement.Repository
+{
+    public class {CLS_NAME} : EFRepository<SystemManageDbContext, {MODEL_NAME}>, {IF_NAME}
+    {
+        public CLS_NAME(SystemManageDbContext dbContext)
+          : base(dbContext)
+        {
+        }
+    }
+}

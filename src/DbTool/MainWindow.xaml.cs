@@ -384,6 +384,7 @@ namespace DbTool
         
         private void GenServiceCode_OnClick(object sender, RoutedEventArgs e)
         {
+            //Controller
             //IService
             //Service
             //IRepository
@@ -425,6 +426,38 @@ namespace DbTool
                     var dialogCode = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateDialogCode(table, options, _dbHelper.DbType);
                     path = Path.Combine(dir, $"{(_settings.ApplyNameConverter ? _modelNameConverter.ConvertTableToModel(table.TableName) : table.TableName)}.vue");
                     File.WriteAllText(path, dialogCode, Encoding.UTF8);
+
+
+                    string modelName = _settings.ApplyNameConverter ? _modelNameConverter.ConvertTableToModel(table.TableName) : table.TableName;
+                    string IFName = $"I{modelName}Repository";
+                    
+                    var code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateIRepositoryCode(IFName, modelName);
+                    path = Path.Combine(dir, $"{IFName}.cs");
+                    File.WriteAllText(path, code, Encoding.UTF8);
+
+                    string classRepositoryName = $"{modelName}Repository";
+                    code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateRepositoryCode(IFName, classRepositoryName, modelName);
+                    path = Path.Combine(dir, $"{classRepositoryName}.cs");
+                    File.WriteAllText(path, code, Encoding.UTF8);
+
+
+                    string IServiceName = $"I{modelName}Service";
+                    string DtoName = $"{modelName}Dto";
+
+                    code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateDTOCode(table, options, DtoName, _dbHelper.DbType);
+                    path = Path.Combine(dir, $"{DtoName}.cs");
+                    File.WriteAllText(path, code, Encoding.UTF8);
+
+
+                    code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateIServiceCode(IServiceName, DtoName);
+                    path = Path.Combine(dir, $"{IServiceName}.cs");
+                    File.WriteAllText(path, code, Encoding.UTF8);
+
+
+                    string ServiceName = $"{modelName}Service";
+                    code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateServiceCode(ServiceName, IServiceName, IFName, DtoName, modelName);
+                    path = Path.Combine(dir, $"{ServiceName}.cs");
+                    File.WriteAllText(path, code, Encoding.UTF8);
 
                 }
             }

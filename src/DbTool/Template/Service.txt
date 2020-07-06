@@ -1,0 +1,62 @@
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
+using SystemManagement.Common;
+using SystemManagement.Dto;
+using SystemManagement.Entity;
+using SystemManagement.Repository.Contract;
+using SystemManagement.Service.Contract;
+using WeihanLi.EntityFramework;
+using WeihanLi.Extensions;
+
+namespace SystemManagement.Service
+{
+    public class {ServiceName} : {IServiceName}
+    {
+        private readonly IMapper _mapper;
+        private readonly UserContext _currentUser;
+        private readonly {IRepository} _repository;
+        
+        public {ServiceName}(IMapper mapper,
+            UserContext currentUser,
+            {IRepository} repository)
+        {
+            _mapper = mapper;
+            _currentUser = currentUser;
+            _repository = repository;
+            
+        }
+        public async Task Delete(long id)
+        {
+            await _repository.DeleteAsync(x=>x.ID == id);
+        }
+
+        public async Task Edit({DTO_NAME} dto)
+        {
+            var model = _mapper.Map<{MODEL_NAME}>(dto);
+            await _repository.UpdateAsync(model);
+        }
+        public async Task Add({DTO_NAME} dto)
+        {
+            var model = _mapper.Map<{MODEL_NAME}>(dto);
+            await _repository.InsertAsync(model);
+        }
+
+        public async Task<List<{DTO_NAME}>> findAll()
+        {
+            var list = await _repository.SelectAsync(x=>true);
+            return _mapper.Map<List<{DTO_NAME}>>(list);
+        }
+
+        public async Task<List<{DTO_NAME}>> findById(long id)
+        {
+            var list = await _repository.SelectAsync(x => x.ID == id);
+            return _mapper.Map<List<{DTO_NAME}>>(list);
+        }
+    }
+}

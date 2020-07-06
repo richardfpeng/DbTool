@@ -1,0 +1,17 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using SystemManagement.Common;
+using SystemManagement.Dto;
+using SystemManagement.Entity;
+
+namespace SystemManagement.Service.Contract
+{
+    public interface {IServiceName} : IService
+    {
+        Task<List<{DTO_NAME}>> findById(long id);        
+        Task<List<{DTO_NAME}>> findAll();
+        Task Delete(long id);
+        Task Add({DTO_NAME} dto);
+        Task Edit({DTO_NAME} dto);
+    }
+}
