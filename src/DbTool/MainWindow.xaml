@@ -55,6 +55,7 @@
                         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
                             <TextBlock Margin="8,4,4,4" Text="{loc:Localizer ChooseTables}"></TextBlock>
                             <Button Name="BtnExportModel" Click="BtnExportModel_OnClick" Margin="4" MaxWidth="300" Content="{loc:Localizer ExportModel}"></Button>
+                            <Button Name="BtnGenerateServiceCode" Click="GenServiceCode_OnClick" Margin="4" MaxWidth="300" Content="{loc:Localizer GenServiceCode}"></Button>
                             <StackPanel Name="DbDocExportersPanel" HorizontalAlignment="Left" Orientation="Horizontal">
                             </StackPanel>
                         </StackPanel>

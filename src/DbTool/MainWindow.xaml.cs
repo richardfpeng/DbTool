@@ -381,6 +381,16 @@ namespace DbTool
                 MessageBox.Show(exception.ToString(), "Error");
             }
         }
+        
+        private void GenServiceCode_OnClick(object sender, RoutedEventArgs e)
+        {
+            //IService
+            //Service
+            //IRepository
+            //Repository
+
+        }
+
 
         private void BtnExportModel_OnClick(object sender, RoutedEventArgs e)
         {
@@ -410,6 +420,12 @@ namespace DbTool
                     var modelCode = _modelCodeGenerator.GenerateModelCode(table, options, _dbHelper.DbType);
                     var path = Path.Combine(dir, $"{(_settings.ApplyNameConverter ? _modelNameConverter.ConvertTableToModel(table.TableName) : table.TableName)}.cs");
                     File.WriteAllText(path, modelCode, Encoding.UTF8);
+
+
+                    var dialogCode = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateDialogCode(table, options, _dbHelper.DbType);
+                    path = Path.Combine(dir, $"{(_settings.ApplyNameConverter ? _modelNameConverter.ConvertTableToModel(table.TableName) : table.TableName)}.vue");
+                    File.WriteAllText(path, dialogCode, Encoding.UTF8);
+
                 }
             }
             // open dir

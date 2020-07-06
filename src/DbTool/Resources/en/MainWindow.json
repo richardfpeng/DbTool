@@ -32,6 +32,7 @@
   "Suffix": "Suffix",
   "ChooseTables": "ChooseTables",
   "ExportModel": "ExportModel",
+  "GenServiceCode": "GenServiceCode",
   "ChooseDirTip": "Choose the dir to save",
   "UnsupportedFileType": "UnsupportedFileType,{0}",
   "ConnectionStringCannotBeEmpty": "ConnectionStringCannotBeEmpty",
