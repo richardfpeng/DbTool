@@ -459,6 +459,13 @@ namespace DbTool
                     path = Path.Combine(dir, $"{ServiceName}.cs");
                     File.WriteAllText(path, code, Encoding.UTF8);
 
+                    //Controller
+                    //Mapper
+                    //Register Entity
+                    //Place files!
+                    //Common Fileds
+                    //Bool ==> tinybit
+                  
                 }
             }
             // open dir

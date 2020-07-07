@@ -10,7 +10,7 @@ namespace SystemManagement.Repository
 {
     public class {CLS_NAME} : EFRepository<SystemManageDbContext, {MODEL_NAME}>, {IF_NAME}
     {
-        public CLS_NAME(SystemManageDbContext dbContext)
+        public {CLS_NAME}(SystemManageDbContext dbContext)
           : base(dbContext)
         {
         }
