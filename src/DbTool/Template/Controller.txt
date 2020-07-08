@@ -1,0 +1,67 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Server.IIS;
+using SystemManagement.Common;
+using SystemManagement.Dto;
+using SystemManagement.Entity;
+using SystemManagement.Service.Contract;
+using WeihanLi.Extensions;
+
+namespace SystemManagement.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    //[Permission("{LMODEL_NAME}")] //remarked for testing only
+    public class {ControllerName} : Controller
+    {
+        private readonly {IServiceName} _service;
+
+        public {ControllerName}({IServiceName} service)
+        {
+            this._service = service;
+        }
+
+
+        //[Log("Query{MODEL_NAME}List")]
+        [HttpGet("list")]
+        public async Task<List<{DTO_NAME}>> List()
+        {
+            return await _service.findAll();
+        }
+
+        [HttpPost]
+        [Log("Add{MODEL_NAME}")]
+        //[Permission("{{LMODEL_NAME}Add}")]
+        [AllowAnonymous] //Anonymous for testing only
+        public async Task Add({DTO_NAME} dto)
+        {
+            await _service.Add(dto);
+        }
+
+        [HttpPut]
+        [Log("Edit{MODEL_NAME}")]
+        [Permission("{LMODEL_NAME}Edit")]
+        //[AllowAnonymous]
+        public async Task Edit({DTO_NAME} dto)
+        {
+            await _service.Edit(dto);
+        }
+
+        [Log("Delete{MODEL_NAME}")]
+        [Permission("{LMODEL_NAME}Delete")]
+        [HttpDelete("{id}")]
+        //[AllowAnonymous]
+        public async Task delete(long id)
+        {
+            await _service.Delete(id);
+        }
+    }
+}

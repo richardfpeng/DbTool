@@ -4,6 +4,7 @@ using System.Text;
 using DbTool.Core;
 using DbTool.Core.Entity;
 using WeihanLi.Extensions;
+using System.Collections.Generic;
 
 // ReSharper disable once CheckNamespace
 namespace DbTool
@@ -12,7 +13,19 @@ namespace DbTool
     {
         private readonly DbProviderFactory _dbProviderFactory;
         private readonly IModelNameConverter _modelNameConverter;
-
+        private readonly List<string> commonFileds = new List<string>()
+        {
+            "id",
+            "field1",
+            "field2",
+            "field3",
+            "note1",
+            "note2",
+            "modifyby",
+            "modifytime",
+            "createby",
+            "createtime",
+        };
         public DefaultModelCodeGenerator(DbProviderFactory dbProviderFactory, IModelNameConverter modelNameConverter)
         {
             _dbProviderFactory = dbProviderFactory;
@@ -43,20 +56,21 @@ namespace DbTool
             sbText.AppendLine();
             sbText.AppendLine($"namespace {options.Namespace}");
             sbText.AppendLine("{");
-            if (options.GenerateDataAnnotation && !string.IsNullOrEmpty(tableEntity.TableDescription))
+            if (options.GenerateDataAnnotation /*&& !string.IsNullOrEmpty(tableEntity.TableDescription)*/)
             {
                 sbText.AppendLine(
                     $"\t/// <summary>{Environment.NewLine}\t/// {tableEntity.TableDescription.Replace(Environment.NewLine, " ")}{Environment.NewLine}\t/// </summary>");
                 sbText.AppendLine($"\t[Table(\"{tableEntity.TableName}\")]");
                 sbText.AppendLine($"\t[Description(\"{tableEntity.TableDescription.Replace(Environment.NewLine, " ")}\")]");
             }
-            sbText.AppendLine($"\tpublic class {options.Prefix}{_modelNameConverter.ConvertTableToModel(tableEntity.TableName)}{options.Suffix}");
+            sbText.AppendLine($"\tpublic class {options.Prefix}{_modelNameConverter.ConvertTableToModel(tableEntity.TableName)}{options.Suffix} : BaseEntityWithReserveColumns<long>");
             sbText.AppendLine("\t{");
             var index = 0;
             if (options.GeneratePrivateFields)
             {
                 foreach (var item in tableEntity.Columns)
                 {
+                    if (commonFileds.Contains(item.ColumnName.ToLower())) continue;
                     if (index > 0)
                     {
                         sbText.AppendLine();
@@ -109,6 +123,7 @@ namespace DbTool
             {
                 foreach (var item in tableEntity.Columns)
                 {
+                    if (commonFileds.Contains(item.ColumnName.ToLower())) continue;
                     if (index > 0)
                     {
                         sbText.AppendLine();
@@ -149,7 +164,7 @@ namespace DbTool
             return sbText.ToString();
         }
 
-        public string GenerateDTOCode(TableEntity tableEntity, ModelCodeGenerateOptions options, string DtoName, string databaseType)
+        public string GenerateDTOCode(TableEntity tableEntity, ModelCodeGenerateOptions options, string modelName, string DtoName, string databaseType)
         {
             if (tableEntity == null)
             {
@@ -169,7 +184,7 @@ namespace DbTool
 
             foreach (var item in tableEntity.Columns)
             {
-                if (item.ColumnName.EqualsIgnoreCase("id")) continue;
+                if (commonFileds.Contains(item.ColumnName.ToLower())) continue;
 
                 if (index > 0)
                 {
@@ -189,6 +204,9 @@ namespace DbTool
             sb.Replace("{PROPERTIES}", sbText.ToString());
             sb.Replace("{DTO_NAME}", DtoName);
 
+            sb.AppendLine($"// public DbSet<{modelName}> {modelName}s {{ get; set; }} //Put this line to SystemManagement.Repository.Contract.SystemManageDbContext");
+            sb.AppendLine($"// modelBuilder.Entity<{modelName}>(); //Put this line to SystemManagement.Repository.Contract.SystemManageDbContext");
+            sb.AppendLine($"// CreateMap<{modelName}, {DtoName}>().ReverseMap(); //Put this line to SystemManagement.Service.SystemManagementProfile");
             return sb.ToString();
 
         }
@@ -363,6 +381,24 @@ namespace DbTool
             sb.Replace("{DTO_NAME}", DtoName);
             sb.Replace("{MODEL_NAME}", modelName);
             sb.Replace("{IRepository}", IRepository);
+
+            return sb.ToString();
+        }
+
+        internal string GenerateControllerCode(string controllerName,
+            string ServiceName
+           , string IServiceName
+           , string IRepository
+           , string DtoName
+           , string modelName)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(File.ReadAllText(@"Template\Controller.txt"));
+            sb.Replace("{ControllerName}", controllerName);
+            sb.Replace("{IServiceName}", IServiceName);
+            sb.Replace("{DTO_NAME}", DtoName);
+            sb.Replace("{MODEL_NAME}", modelName);
+            sb.Replace("{LMODEL_NAME}", char.ToLower(modelName[0]) + modelName.Substring(1));
 
             return sb.ToString();
         }

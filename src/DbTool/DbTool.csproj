@@ -32,6 +32,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Template\Controller.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Template\DTO.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

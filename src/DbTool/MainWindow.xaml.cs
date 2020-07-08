@@ -48,6 +48,9 @@ namespace DbTool
             _modelNameConverter = modelNameConverter;
 
             InitDataBinding();
+
+            TxtNamespace.Text = "SystemManagement.Entity";
+
         }
 
         private void InitDataBinding()
@@ -402,7 +405,7 @@ namespace DbTool
             }
             var options = new ModelCodeGenerateOptions()
             {
-                Namespace = TxtNamespace.Text.GetValueOrDefault("Models"),
+                Namespace = TxtNamespace.Text.GetValueOrDefault("SystemManagement.Entity"),
                 Prefix = TxtPrefix.Text,
                 Suffix = TxtSuffix.Text,
                 GenerateDataAnnotation = CbGenDataAnnotation.IsChecked == true,
@@ -444,7 +447,7 @@ namespace DbTool
                     string IServiceName = $"I{modelName}Service";
                     string DtoName = $"{modelName}Dto";
 
-                    code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateDTOCode(table, options, DtoName, _dbHelper.DbType);
+                    code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateDTOCode(table, options, modelName, DtoName, _dbHelper.DbType);
                     path = Path.Combine(dir, $"{DtoName}.cs");
                     File.WriteAllText(path, code, Encoding.UTF8);
 
@@ -460,12 +463,15 @@ namespace DbTool
                     File.WriteAllText(path, code, Encoding.UTF8);
 
                     //Controller
-                    //Mapper
-                    //Register Entity
-                    //Place files!
-                    //Common Fileds
-                    //Bool ==> tinybit
+                    string controllerName = $"{modelName}Controller";
+                    code = ((DefaultModelCodeGenerator)_modelCodeGenerator).GenerateControllerCode(controllerName, ServiceName, IServiceName, IFName, DtoName, modelName);
+                    path = Path.Combine(dir, $"{controllerName}.cs");
+                    File.WriteAllText(path, code, Encoding.UTF8);
+
                   
+                    //Place files!
+                    //Bool ==> tinybit
+
                 }
             }
             // open dir
